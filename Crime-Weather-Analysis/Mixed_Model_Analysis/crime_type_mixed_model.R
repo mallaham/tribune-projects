@@ -59,7 +59,7 @@
 #######################################################
 library(lme4) #importing library for linear mixed models.
 library (ggplot2)
-setwd('/Users/Mowafak/Documents/Tribune/weather_Temp & shootings/Stats Analysis/')
+setwd('./')
 data <- read.csv('temp_reg_analysis.csv')
 data$X <- NULL
 
