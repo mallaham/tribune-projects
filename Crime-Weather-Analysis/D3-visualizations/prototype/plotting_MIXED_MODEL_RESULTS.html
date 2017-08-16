@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.line {
+  fill: none;
+  stroke: red;
+  stroke-width: 3.5px;
+}
+
+.dot {
+  fill: white;
+  stroke: grey;
+  opacity: .3;
+  stroke-width: 1.5px;
+}
+
+</style>
+<body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+//original code to plot line: https://bl.ocks.org/mbostock/3310323
+//reference to label axes: http://www.d3noob.org/2016/10/adding-axis-labels-in-d3js-v4.html
+
+var margin = {top: 20, right: 20, bottom: 50, left: 70},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+//reading csv file to plot the data points
+d3.csv("crime_temp_data_chicago_homicide_included.csv", function(error, data) {
+
+        //numbers were derived from a mixed model analysis that was run separately.
+        //refer to crime_type_mixed_model.R to read more about how the analysis was done.
+        var intercept = [32.696375,94.347233,34.521898,58.796721,66.972031,130.474161,12.9848733]
+        var slope = [0.331445,0.945469,0.190922,0.491615,0.065941,0.928136,-0.0017754]
+        var effect = [3,9,2,5,0,9,0]
+        var crimes =['ASSAULT','BATTERY','BURGLARY','CRIMINAL DAMAGE','NARCOTICS','THEFT','HOMICIDE']
+        
+        for (i=0; i<crimes.length; i++){
+          
+          function get_filtered_data(value) {
+            return value.Primary_Type == crimes[i]; //filter data based on crime type
+          }
+
+          //selecting a subset of the data that matches the crime type we want to plot
+          filteredData = data.filter(get_filtered_data);
+
+          //converting all data entries in filteredData to integers
+          filteredData.map(function(d){
+            d.Mean_Temp =+d.Mean_Temp;
+            d.Count=+d.Count;
+          })
+          
+          //setting a list of dictionaries that include intercepts, slopes
+          var data2 = [{x: 0, y:intercept[i]},{x:100,y:d3.max(filteredData, function(d) { return intercept[i]+ (d.Mean_Temp*slope[i]); })}];
+          console.log(data2);
+          
+
+          //Scaling x and y points so they fit the scale
+          var x = d3.scaleLinear()
+              .domain([d3.min(filteredData, function(d) { return d.Mean_Temp; }),d3.max(filteredData, function(d) { return d.Mean_Temp; })])
+              .range([0,width]);
+
+          var y = d3.scaleLinear()
+              .domain([d3.min(filteredData, function(d) { return d.Count; }), d3.max(filteredData, function(d) { return d.Count; })])
+              .range([height, 0]);
+
+          var xAxis = d3.axisBottom()
+              .scale(x);
+
+          var yAxis = d3.axisLeft()
+              .scale(y);
+          
+          var line = d3.line()
+          .x(function(d) { return x(d.x); })
+          .y(function(d) { return y(d.y); });
+
+          var svg = d3.select("body").append("svg")
+              .datum(data2)
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+          svg.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(xAxis);
+
+          svg.append("text")
+          .attr("transform",
+              "translate(" + (width/2) + " ," + 
+                             (height + margin.top + 20) + ")")
+          .style("font-size", "16px") 
+          .style("text-anchor", "middle")
+          .text("Average Daily Temperature in (F)");
+
+
+          svg.append("g")
+              .attr("class", "y axis")
+              .call(yAxis);
+          svg.append("path")
+              .attr("class", "line")
+              .attr("d", line);
+
+
+          svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left)
+            .attr("x",0 - (height / 2))
+            .attr("dy", "1em")
+            .style("font-size", "16px") 
+            .style("text-anchor", "middle")
+            .text("Number of Theft Incidents"); 
+
+          svg.append("text")
+          .attr("x", (width / 2))             
+          .attr("y", 0 - (margin.top / 3))
+          .attr("text-anchor", "middle")  
+          .style("font-size", "16px") 
+          .text(crimes[i].concat(": "+effect[i]+" incidents increase per 10 Fahrenheit increase in temperature")); //this has to be generate automatically.
+
+
+          svg.selectAll(".dot")
+              .data(filteredData)
+            .enter().append("circle")
+              .attr("class", "dot")
+              .attr("cx",function(d) { return x(d.Mean_Temp);})
+              .attr("cy",function(d){return y(d.Count);})
+              .attr("r", 3.5);
+
+  }
+});
+</script>
