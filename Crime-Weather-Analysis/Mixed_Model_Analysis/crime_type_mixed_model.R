@@ -43,7 +43,7 @@
 # Mean_Temp:Primary.TypeMOTOR VEHICLE THEFT   0.028752   0.020328    1.41
 # Mean_Temp:Primary.TypeNARCOTICS             0.070149   0.020328    3.45
 # Mean_Temp:Primary.TypeTHEFT                 0.932344   0.020328   45.87
-
+# Mean_Temp:Primary.TypeHOMICIDE              0.0003812   0.0242559  0.02
 # the measure of significance in this analysis is when the t-value
 # is greater or equals to 2.
 # Our analysis shows that for every 10 degrees increase in temperature,
@@ -59,6 +59,7 @@
 #######################################################
 library(lme4) #importing library for linear mixed models.
 library (ggplot2)
+#options(scipen=999) #disables scientific notation
 setwd('./')
 data <- read.csv('temp_reg_analysis.csv')
 data$X <- NULL
@@ -85,12 +86,13 @@ ranef(mlm.1)
 
 ####Dummy code the variables
 levels(data$Primary.Type) <- c(levels(data$Primary.Type),'Other') #recoding the crimes to "other"
-crimeType <-c('THEFT', 'BATTERY', 'CRIMINAL DAMAGE', 'NARCOTICS', 'ASSAULT', 'MOTOR VEHICLE THEFT', 'ROBERRY','BURGLARY')
+crimeType <-c('THEFT', 'BATTERY', 'CRIMINAL DAMAGE', 'NARCOTICS', 'ASSAULT', 'MOTOR VEHICLE THEFT', 'ROBERRY','BURGLARY','HOMICIDE')
 data$Primary.Type[!(data$Primary.Type %in%  crimeType)]<-'Other'
 
 data$Primary.Type<-relevel(data$Primary.Type,ref='Other') #releveling the baseline to "Other"
 mlm.2 <- lmer(Count~Mean_Temp*Primary.Type+(1|Year)+(1|Primary.Type),data=data,REML = FALSE)
 summary(mlm.2)
+
 # The interaction terms represent the slope of the interaction term in each row.
 # The intercepts represent the point where the linear line starts for each
 # crime type at x=0.
@@ -98,3 +100,9 @@ summary(mlm.2)
 # Interpretation of slopes:
 # e.g., for Mean_Temp:Primary.TypeASSAULT for every 10 units increase in temperature
 # there are 3 assault incidents above the average of other crimes.
+
+# How to calculate the intercept, slope, and effect for each crime type?
+# Effect = the interaction term of Mean_Temp and crime type (e.g, THEFT) * 10. 10 represent number of degrees.
+# Slope = (the interaction term of Mean_Temp and crime type) + (intercept of the slope, which is 
+# Mean_Temp)
+# Intercept = (the main effect of crime type (e.g., THEFT)) + (Intercept: intercept of other crimes. The first row of the Fixed effects table.)

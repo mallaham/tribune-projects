@@ -1,0 +1,2 @@
+to generate temp_reg_analysis.csv file, go back to Crime_Weather_Report-Analysis to cell 20. Output the file in .csv
+then run manually a script to select the subset of crimes you are interested in analyzing.
