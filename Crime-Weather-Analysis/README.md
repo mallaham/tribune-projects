@@ -78,7 +78,7 @@ Since crimes differ in their rate of occurance, this means that each crime could
 
 The Tribune later verified wether the rise in temperature has any effect on homicides. The results show that temperature fails to predict the number of homicides that could occur as temperature increases.
 
-Below shows a summary of the MLM results:
+Below is a summary of the MLM results:
 
 
 |Effects                                    |Estimate    |std.err   |t-value|
