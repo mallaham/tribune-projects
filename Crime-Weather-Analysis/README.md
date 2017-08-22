@@ -76,7 +76,7 @@ Since crimes differ in their rate of occurance, this means that each crime could
 - 2 burgulary incidents
 - 1 narcotics incident 
 
-The Tribune later verified wether the rise in temperature has any effect on homicides. The results show that temperature fails to predict the number of homicides that could occur as temperature increases. This is partially due to the inconsistent pattern that homocides follow during the past 5 years.
+The Tribune later verified wether the rise in temperature has any effect on homicides. The results show that temperature fails to predict the number of homicides that could occur as temperature increases.
 
 Below shows a summary of the MLM results:
 
